@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pasangan Makanan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Website Pasangan Makanan</h1>
+  <p>Pilih makanan utama:</p>
+
+  <select id="makanan" onchange="tampilkanPasangan()">
+    <option value="">-- Pilih Makanan --</option>
+    <option value="ayam">Ayam Goreng</option>
+    <option value="mie">Mie Goreng</option>
+    <option value="burger">Burger</option>
+  </select>
+
+  <h2>Makanan yang cocok:</h2>
+  <ul id="hasil"></ul>
+
+  <script src="script.js"></script>
+</body>
+</html>
