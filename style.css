@@ -16,3 +16,8 @@ select {
 ul {
   margin-top: 10px;
 }
+.gambar {
+  width: 150px;
+  margin: 10px;
+  border-radius: 10px;
+}
