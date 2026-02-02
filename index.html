@@ -75,6 +75,170 @@
       <h2>Pilih Menu</h2>
       <select id="menuSelect"></select>
       <br />
+      <label>Jumlah:</label>
+      <input type="number" id="jumlahInput" min="1" value="1" />
+      <br />
+      <button onclick="tambahMenu()">Tambah ke Keranjang</button>
+    </div><!-- Keranjang -->
+<div class="section">
+  <h2>Keranjang Menu</h2>
+  <ul id="keranjang" class="menu-list"></ul>
+</div>
+
+<!-- Saran -->
+<div class="section hidden" id="saranSection">
+  <h2>Saran Menu Berikutnya</h2>
+  <p id="saranText"></p>
+</div>
+
+<!-- Selesai -->
+<div class="section">
+  <button onclick="clearKeranjang()">Clear Keranjang</button>
+</div>
+
+<!-- Hasil Akhir -->
+<div class="section hidden" id="hasilSection">
+  <h2>Menu Lengkap Anda</h2>
+  <ul id="hasilAkhir"></ul>
+</div>
+
+  </div>  <script>
+    const semuaMenu = {
+      "nasi-goreng": { nama: "Nasi Goreng", img: "img/nasi-goreng.jpg" },
+      "telur": { nama: "Telur Mata Sapi", img: "img/telur.jpg" },
+      "kerupuk": { nama: "Kerupuk", img: "img/kerupuk.jpg" },
+      "bakso": { nama: "Bakso", img: "img/bakso.jpg" },
+      "mie": { nama: "Mie", img: "img/mie.jpg" },
+      "pangsit": { nama: "Pangsit", img: "img/pangsit.jpg" },
+      "sate": { nama: "Sate", img: "img/sate.jpg" },
+      "lontong": { nama: "Lontong", img: "img/lontong.jpg" },
+      "ayam-goreng": { nama: "Ayam Goreng", img: "img/ayam-goreng.jpg" },
+      "sambal": { nama: "Sambal", img: "img/sambal.jpg" },
+      "lalapan": { nama: "Lalapan", img: "img/lalapan.jpg" }
+    };
+
+    const aturanSaran = {
+      "nasi-goreng": ["telur", "kerupuk"],
+      "bakso": ["mie", "pangsit"],
+      "sate": ["lontong"],
+      "ayam-goreng": ["sambal", "lalapan"]
+    };
+
+    const keranjang = []; // { key, jumlah }
+
+    const select = document.getElementById('menuSelect');
+
+    function updateDropdown(menuList) {
+      select.innerHTML = '<option value="">-- Pilih Makanan --</option>';
+      menuList.forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = semuaMenu[key].nama;
+        select.appendChild(opt);
+      });
+    }
+
+    updateDropdown(Object.keys(semuaMenu));
+
+    function tambahMenu() {
+      const value = select.value;
+      const jumlah = parseInt(document.getElementById('jumlahInput').value);
+      if (!value || jumlah < 1) return;
+
+      const existing = keranjang.find(item => item.key === value);
+      if (existing) {
+        existing.jumlah += jumlah;
+      } else {
+        keranjang.push({ key: value, jumlah });
+      }
+
+      renderKeranjang();
+
+      // tampilkan saran (opsional, tidak mengubah dropdown)
+      if (aturanSaran[value]) {
+        const saran = aturanSaran[value]
+          .filter(m => !keranjang.some(item => item.key === m))
+          .map(m => semuaMenu[m].nama)
+          .join(', ');
+
+        if (saran) {
+          document.getElementById('saranText').textContent = 'Saran menu berikutnya: ' + saran;
+          document.getElementById('saranSection').classList.remove('hidden');
+        }
+      }
+
+      document.getElementById('jumlahInput').value = 1;
+    }
+
+    function renderKeranjang() {
+      const ul = document.getElementById('keranjang');
+      ul.innerHTML = '';
+
+      keranjang.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'menu-item';
+
+        const img = document.createElement('img');
+        img.src = semuaMenu[item.key].img;
+        img.alt = semuaMenu[item.key].nama;
+
+        const span = document.createElement('span');
+        span.textContent = semuaMenu[item.key].nama + ' (x' + item.jumlah + ')';
+
+        li.appendChild(img);
+        li.appendChild(span);
+        ul.appendChild(li);
+      });
+    }
+
+    function clearKeranjang() {
+      keranjang.length = 0;
+      document.getElementById('keranjang').innerHTML = '';
+      document.getElementById('saranSection').classList.add('hidden');
+      updateDropdown(Object.keys(semuaMenu));
+    }
+  </script></body>
+</html>      background: #e57c3a;
+    }
+    .section {
+      background: white;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    ul {
+      padding-left: 0;
+      list-style: none;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .menu-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #ddd;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Website Keranjang Menu</h1>
+    <p>Pilih menu satu per satu, sistem akan memberi saran menu berikutnya</p>
+  </header>  <div class="container">
+    <!-- Pilih Menu -->
+    <div class="section">
+      <h2>Pilih Menu</h2>
+      <select id="menuSelect"></select>
+      <br />
       <button onclick="tambahMenu()">Tambah ke Keranjang</button>
     </div><!-- Keranjang -->
 <div class="section">
