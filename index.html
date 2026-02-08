@@ -1,8 +1,10 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Keranjang Menu Makanan</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,20 +23,320 @@
       max-width: 900px;
       margin: auto;
     }
-    select, button {
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 10px;
+    .section {
+      background: white;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, select {
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
+    }
+    #searchInput, #menuSelect {
+      width: 260px;
+      margin-bottom: 8px;
+    }
+    #jumlahInput {
+      width: 70px;
     }
     button {
       background: #ff914d;
       color: white;
       border: none;
       border-radius: 5px;
+      padding: 10px;
+      width: 200px;
       cursor: pointer;
+      margin-top: 10px;
     }
     button:hover {
       background: #e57c3a;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .menu-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #ddd;
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 600px) {
+      #searchInput, #menuSelect, button {
+        width: 100%;
+      }
+      #jumlahInput {
+        width: 100px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>MENUMENU</h1>
+  <p>Pilih menumu, lihat harga, dan total otomatis :)</p>
+</header>
+
+<div class="container">
+
+  <!-- Pilih Menu -->
+  <div class="section">
+    <h2>Pilih Menu</h2>
+
+    <label>Cari Menu:</label><br>
+    <input type="text" id="searchInput" placeholder="Ketik nama makanan..."><br>
+
+    <select id="menuSelect"></select><br>
+
+    <label>Jumlah:</label><br>
+    <input type="number" id="jumlahInput" min="1" value="1">
+
+    <p id="hargaMenu">Harga: -</p>
+
+    <button onclick="tambahMenu()">Tambah ke Keranjang</button>
+  </div>
+
+  <!-- Keranjang -->
+  <div class="section">
+    <h2>Menu Anda</h2>
+    <ul id="keranjang"></ul>
+    <p id="totalHarga"><strong>Total: Rp 0</strong></p>
+  </div>
+
+  <!-- Saran -->
+  <div class="section hidden" id="saranSection">
+    <h2>Saran Menu Berikutnya</h2>
+    <p id="saranText"></p>
+  </div>
+
+  <!-- Clear -->
+  <div class="section">
+    <button onclick="clearKeranjang()">Clear Keranjang</button>
+  </div>
+
+</div>
+
+<script>
+  const semuaMenu = {
+"mie_goreng": { nama: "Mie Goreng", img: "img/mie_goreng.jpg", harga: 15000 },
+"nasi_goreng": { nama: "Nasi Goreng", img: "img/nasi_goreng.jpg", harga: 17000 },
+"bubur_ayam": { nama: "Bubur Ayam", img: "img/bubur_ayam.jpg", harga: 15000 },
+"nasi_uduk": { nama: "Nasi Uduk", img: "img/nasi_uduk.jpg", harga: 15000 },
+"nasi_padang": { nama: "Nasi Padang", img: "img/nasi_padang.jpg", harga: 22000 },
+"nasi_pecel": { nama: "Nasi Pecel", img: "img/nasi_pecel.jpg", harga: 15000 },
+"ikan_bakar": { nama: "Ikan Bakar", img: "img/ikan_bakar.jpg", harga: 25000 },
+"nasi_campur": { nama: "Nasi Campur", img: "img/nasi_campur.jpg", harga: 18000 },
+"lontong_opor": { nama: "Lontong Opor", img: "img/lontong_opor.jpg", harga: 18000 },
+"soto": { nama: "Soto", img: "img/soto.jpg", harga: 15000 },
+"rawon": { nama: "Rawon", img: "img/rawon.jpg", harga: 20000 },
+"mie_ayam": { nama: "Mie Ayam", img: "img/mie_ayam.jpg", harga: 15000 },
+"penyetan": { nama: "Penyetan", img: "img/penyetan.jpg", harga: 18000 },
+"sate_ayam": { nama: "Sate Ayam", img: "img/sate_ayam.jpg", harga: 20000 },
+"ketoprak": { nama: "Ketoprak", img: "img/ketoprak.jpg", harga: 12000 },
+"seblak": { nama: "Seblak", img: "img/seblak.jpg", harga: 15000 },
+"capjay": { nama: "Capjay", img: "img/capjay.jpg", harga: 18000 },
+"ayam_geprek": { nama: "Ayam Geprek", img: "img/ayam_geprek.jpg", harga: 18000 },
+"gado_gado": { nama: "Gado Gado", img: "img/gado_gado.jpg", harga: 12000 },
+"tahu_tek": { nama: "Tahu Tek", img: "img/tahu_tek.jpg", harga: 13000 },
+"rendang": { nama: "Rendang", img: "img/rendang.jpg", harga: 22000 },
+"tempe": { nama: "Tempe", img: "img/tempe.jpg", harga: 4000 },
+"tahu": { nama: "Tahu", img: "img/tahu.jpg", harga: 4000 },
+"lontong": { nama: "Lontong", img: "img/lontong.jpg", harga: 4000 },
+"bakso": { nama: "Bakso", img: "img/bakso.jpg", harga: 15000 },
+"sosis": { nama: "Sosis", img: "img/sosis.jpg", harga: 5000 },
+"nasi_kuning": { nama: "Nasi Kuning", img: "img/nasi_kuning.jpg", harga: 17000 },
+"telur_balado": { nama: "Telur Balado", img: "img/telur_balado.jpg", harga: 6000 },
+"telur_dadar": { nama: "Telur Dadar", img: "img/telur_dadar.jpg", harga: 6000 },
+"ceker_ayam": { nama: "Ceker Ayam", img: "img/ceker_ayam.jpg", harga: 10000 },
+"pangsit": { nama: "Pangsit", img: "img/pangsit.jpg", harga: 6000 },
+"ayam_suwir": { nama: "Ayam Suwir", img: "img/ayam_suwir.jpg", harga: 8000 },
+"siomay": { nama: "Siomay", img: "img/siomay.jpg", harga: 12000 },
+"pempek": { nama: "Pempek", img: "img/pempek.jpg", harga: 15000 },
+"mie_kuning": { nama: "Mie Kuning", img: "img/mie_kuning.jpg", harga: 6000 },
+"bakso_aci": { nama: "Bakso Aci", img: "img/bakso_aci.jpg", harga: 15000 },
+"sup_ayam": { nama: "Sup Ayam", img: "img/sup_ayam.jpg", harga: 15000 },
+"lele_goreng": { nama: "Lele Goreng", img: "img/lele_goreng.jpg", harga: 15000 },
+"sayur_lodeh": { nama: "Sayur Lodeh", img: "img/sayur_lodeh.jpg", harga: 18000 },
+"sop_buntut": { nama: "Sop Buntut", img: "img/sop_buntut.jpg", harga: 35000 },
+"emping": { nama: "Emping", img: "img/emping.jpg", harga: 4000 },
+"ayam_bakar": { nama: "Ayam Bakar", img: "img/ayam_bakar.jpg", harga: 20000 },
+"bebek_goreng": { nama: "Bebek Goreng", img: "img/bebek_goreng.jpg", harga: 28000 },
+"nasi_remes": { nama: "Nasi Remes", img: "img/nasi_remes.jpg", harga: 18000 },
+"nasi_bakar": { nama: "Nasi Bakar", img: "img/nasi_bakar.jpg", harga: 18000 },
+"kwetiau_goreng": { nama: "Kwetiau Goreng", img: "img/kwetiau_goreng.jpg", harga: 15000 },
+"bihun_goreng": { nama: "Bihun Goreng", img: "img/bihun_goreng.jpg", harga: 15000 },
+"sop_iga": { nama: "Sop Iga", img: "img/sop_iga.jpg", harga: 30000 },
+"dendeng_balado": { nama: "Dendeng Balado", img: "img/dendeng_balado.jpg", harga: 22000 }
+};
+
+  const aturanSaran = {
+"mie_goreng": ["telur_dadar","sosis","bakso"],
+"nasi_goreng": ["telur_dadar","sosis","ayam_suwir"],
+"bubur_ayam": ["telur_balado","ayam_suwir","emping"],
+"nasi_uduk": ["telur_balado","ayam_suwir","tempe"],
+"nasi_padang": ["rendang","ayam_bakar","sayur_lodeh"],
+"nasi_pecel": ["tempe","tahu","telur_balado"],
+"ikan_bakar": ["sayur_lodeh","capjay","telur_dadar"],
+"nasi_campur": ["rendang","ayam_bakar","telur_balado"],
+"lontong_opor": ["telur_balado","ayam_suwir","emping"],
+"soto": ["emping","telur_dadar","tempe"],
+"rawon": ["emping","telur_balado","tempe"],
+"mie_ayam": ["bakso","pangsit","siomay"],
+"penyetan": ["tempe","tahu","telur_dadar"],
+"sate_ayam": ["lontong","ketoprak","gado_gado"],
+"ketoprak": ["gado_gado","tahu_tek","lontong"],
+"seblak": ["sosis","telur_dadar","bakso"],
+"capjay": ["ayam_suwir","telur_dadar","tahu"],
+"ayam_geprek": ["telur_dadar","tempe","sayur_lodeh"],
+"gado_gado": ["ketoprak","tahu_tek","lontong"],
+"tahu_tek": ["ketoprak","gado_gado","lontong"],
+"rendang": ["nasi_padang","sayur_lodeh","tempe"],
+"tempe": ["tahu","sayur_lodeh","capjay"],
+"tahu": ["tempe","sayur_lodeh","capjay"],
+"lontong": ["sate_ayam","ketoprak","gado_gado"],
+"bakso": ["pangsit","siomay","mie_ayam"],
+"sosis": ["mie_goreng","seblak","nasi_goreng"],
+"nasi_kuning": ["telur_balado","ayam_suwir","tempe"],
+"telur_balado": ["nasi_padang","nasi_uduk","nasi_kuning"],
+"telur_dadar": ["nasi_goreng","mie_goreng","seblak"],
+"ceker_ayam": ["soto","seblak","bakso"],
+"pangsit": ["bakso","mie_ayam","siomay"],
+"ayam_suwir": ["nasi_uduk","nasi_kuning","capjay"],
+"siomay": ["bakso","pangsit","pempek"],
+"pempek": ["siomay","bakso","lontong"],
+"mie_kuning": ["bakso","pangsit","siomay"],
+"bakso_aci": ["seblak","bakso","ceker_ayam"],
+"sup_ayam": ["soto","sayur_lodeh","capjay"],
+"lele_goreng": ["sayur_lodeh","tempe","tahu"],
+"sayur_lodeh": ["tempe","tahu","ayam_bakar"],
+"sop_buntut": ["soto","rawon","sup_ayam"],
+"emping": ["soto","rawon","bubur_ayam"],
+"ayam_bakar": ["nasi_padang","sayur_lodeh","capjay"],
+"bebek_goreng": ["sayur_lodeh","tempe","tahu"],
+"nasi_remes": ["ayam_suwir","telur_balado","tempe"],
+"nasi_bakar": ["ayam_suwir","telur_dadar","tempe"],
+"kwetiau_goreng": ["telur_dadar","sosis","bakso"],
+"bihun_goreng": ["telur_dadar","sosis","bakso"],
+"sop_iga": ["soto","rawon","sup_ayam"],
+"dendeng_balado": ["nasi_padang","sayur_lodeh","tempe"]
+  };
+
+  const keranjang = [];
+  const select = document.getElementById("menuSelect");
+
+  function updateDropdown(list) {
+    select.innerHTML = '<option value="">-- Pilih Makanan --</option>';
+    list.forEach(key => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = semuaMenu[key].nama;
+      select.appendChild(opt);
+    });
+  }
+
+  updateDropdown(Object.keys(semuaMenu));
+
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const key = this.value.toLowerCase();
+    const hasil = Object.keys(semuaMenu).filter(k =>
+      semuaMenu[k].nama.toLowerCase().includes(key)
+    );
+    updateDropdown(hasil);
+  });
+
+  select.addEventListener("change", function () {
+    if (!this.value) {
+      document.getElementById("hargaMenu").textContent = "Harga: -";
+      return;
+    }
+    const harga = semuaMenu[this.value].harga;
+    document.getElementById("hargaMenu").textContent =
+      "Harga: Rp " + harga.toLocaleString("id-ID");
+  });
+
+  function tambahMenu() {
+    const key = select.value;
+    const jumlah = parseInt(document.getElementById("jumlahInput").value);
+    if (!key || jumlah < 1) return;
+
+    const ada = keranjang.find(i => i.key === key);
+    if (ada) {
+      ada.jumlah += jumlah;
+    } else {
+      keranjang.push({ key, jumlah });
+    }
+
+    renderKeranjang();
+
+    if (aturanSaran[key]) {
+      const saran = aturanSaran[key]
+        .filter(m => !keranjang.some(k => k.key === m))
+        .map(m => semuaMenu[m].nama)
+        .join(", ");
+      if (saran) {
+        document.getElementById("saranText").textContent =
+          "Saran menu berikutnya: " + saran;
+        document.getElementById("saranSection").classList.remove("hidden");
+      }
+    }
+
+    document.getElementById("jumlahInput").value = 1;
+  }
+
+  function renderKeranjang() {
+    const ul = document.getElementById("keranjang");
+    ul.innerHTML = "";
+    let total = 0;
+
+    keranjang.forEach(item => {
+      const menu = semuaMenu[item.key];
+      const subtotal = menu.harga * item.jumlah;
+      total += subtotal;
+
+      const li = document.createElement("li");
+      li.className = "menu-item";
+
+      li.innerHTML = `
+        <img src="${menu.img}" alt="${menu.nama}">
+        <div>
+          ${menu.nama} (x${item.jumlah})<br>
+          Rp ${menu.harga.toLocaleString("id-ID")} →
+          <strong>Rp ${subtotal.toLocaleString("id-ID")}</strong>
+        </div>
+      `;
+      ul.appendChild(li);
+    });
+
+    document.getElementById("totalHarga").innerHTML =
+      "<strong>Total: Rp " + total.toLocaleString("id-ID") + "</strong>";
+  }
+
+  function clearKeranjang() {
+    keranjang.length = 0;
+    renderKeranjang();
+    document.getElementById("saranSection").classList.add("hidden");
+  }
+</script>
+
+</body>
+</html>      background: #e57c3a;
     }
     .section {
       background: white;
